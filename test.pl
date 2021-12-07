@@ -49,11 +49,9 @@ part_2_acquisition_prop_type1(I,Abi,Abi1,Tbox) :-
 	nl,
 	read(C),
 	recc_replace(C,C_transformed),
-	write(C_transformed),
 	validate_concept(C_transformed),
-	nnf(not(inst(I,C_transformed)),Prop_to_add_in_Abox),
-	concat(Abi,[Prop_to_add_in_Abox],Abi1),
-	write(Abi1).
+	nnf(not(C_transformed),Prop_to_add_in_Abox),
+	concat(Abi,[inst(I,Prop_to_add_in_Abox)],Abi1).
 
 acquisition_prop_type2(Abi,Abi1,Tbox) :-
 	part_1_acquisition_prop_type2(Abi,Abi1,Tbox).
@@ -73,9 +71,8 @@ part_2_acquisition_prop_type2(C1,Abi,Abi1,Tbox) :-
 	read(C2),
 	recc_replace(C2,C2_transformed),
 	validate_concept(C2_transformed),
-	nnf(some(X,and(C1,C2)),Prop_to_add_in_Abox),
-	concat(Abi,[Prop_to_add_in_Abox],Abi1),
-	write(Abi1).
+	nnf(and(C1,C2),Prop_to_add_in_Abox),
+	concat(Abi,[some(X,Prop_to_add_in_Abox)],Abi1).
 /*
  *
  *Verification sur l'instance
@@ -118,35 +115,52 @@ literal(X) :- not(Y) = X , literal(Y).
 
 troisieme_etape(Abi,Abr) :-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
-	resolution(Lie,Lpt,Li,Lu,Ls,Abr),
+  resolution(Lie,Lpt,Li,Lu,Ls,Abr),
 	nl,
 	write('Youpiiiiii, on a demontre la proposition initiale !!!').
 
-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls):-
-	setof((Ie,some(Re,Ce)), member((Ie,some(Re,Ce),Abi)),Lie),iname(Ie), concept(Ce), rname(Re),
-	setof((Ipt,some(Rpt,Cpt)), member((Ipt,all(Rpt,Cpt),Abi)),Lpt),iname(Ipt), concept(Cpt), rname(Rpt),
-	setof((Ii,and(Ci1,Ci2))), member((Ii,and(Ci1,Ci2),Abi)),Li),iname(Ii), concept(Ci1), concept(Ci2),
-	setof((Iu,and(Cu1,Cu2))), member((Iu,and(Cu1,Cu2),Abi)),Li),iname(Iu), concept(Cu1), concept(Cu2),
-	setof((Is,Cs),member((Is,Cs),Abi),Ls), iname(Is), literal(Cs).
+/*traitement des litteraux*/
+tri_Abox([],[],[],[],[],[]).
+tri_Abox([(I,C)],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls), literal(C), iname(I).
+tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
+	iname(I),
+	literal(C).
+/*traitement existe*/
+tri_Abox([inst(I,some(R,C))],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls),
+	iname(I), concept(C), rname(R).
+tri_Abox([inst(I,some(R,C))|Abi],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
+	iname(I), concept(C), rname(R).
+
+/*traitement quelque soit*/
+tri_Abox([inst(I,all(R,C))],[(I,all(R,C))|Lie],Lpt,Li,Lu,Ls):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls),
+	iname(I), concept(C), rname(R).
+tri_Abox([inst(I,all(R,C))|Abi],[(I,all(R,C))|Lie],Lpt,Li,Lu,Ls):-
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
+	iname(I), concept(C), rname(R).
+
+/* traitement and*/
+tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+tri_Abox([inst(I,and(C1,C2))|Abi],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+
+/*traitement or*/
+tri_Abox([inst(I,or(C1,C2))],Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
 
 
-resolution(Abi,Lie,Lpt,Li,Lu,Ls) :-
-	complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
-	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
-	deduction_all(Lie,Lpt,Li,Lu,Ls,Abr),
-	transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
-
+resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
+	complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
 complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
-	/*to complete*/
-transformation_and(Lie,Lpt,Li,Lu,Ls,Abr) :-
-	/*to complete*/
-deduction_all(Lie,Lpt,Li,Lu,Ls,Abr) :-
-	/*to complete*/
-transformation_or(Lie,Lpt,Li,Lu,Ls,Abr) :-
-	/*to complete*/
-evolue(A, Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1) :-
-	/*to complete*/
-test_clash(Abi) :-
-	/*to complete*/
-affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu2, Abr2) :-
-	/*to complete*/
+	write(Lie),
+	write(Lpt),
+	write(Li),
+	write(Lu),
+	write(Ls).
