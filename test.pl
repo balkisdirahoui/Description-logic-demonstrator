@@ -45,11 +45,14 @@ part_1_acquisition_prop_type1(Abi,Abi1,Tbox)	:-
 		validate_instance(I),
 		write('Entrez le nom du concept sur lequel vous voulez effectuer le test:'),
 		part_2_acquisition_prop_type1(I,Abi,Abi1,Tbox).
+/*part 2 to add in type 1*/
 part_2_acquisition_prop_type1(I,Abi,Abi1,Tbox) :-
 	nl,
 	read(C),
+	/*a*/
 	recc_replace(C,C_transformed),
 	validate_concept(C_transformed),
+	/*b*/
 	nnf(not(C_transformed),Prop_to_add_in_Abox),
 	concat(Abi,[inst(I,Prop_to_add_in_Abox)],Abi1).
 
@@ -64,13 +67,20 @@ part_1_acquisition_prop_type2(Abi,Abi1,Tbox) :-
 	recc_replace(C1,C1_transformed),
 	validate_concept(C1_transformed),
 	part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox).
+
+
+
+
+
 part_2_acquisition_prop_type2(C1,Abi,Abi1,Tbox) :-
 	nl,
 	write('Entrez le nom du deuxieme concept:'),
 	nl,
 	read(C2),
+	/* a*/
 	recc_replace(C2,C2_transformed),
 	validate_concept(C2_transformed),
+	/*b*/
 	nnf(and(C1,C2),Prop_to_add_in_Abox),
 	concat(Abi,[some(X,Prop_to_add_in_Abox)],Abi1).
 /*
@@ -101,6 +111,8 @@ concept(all(R,C)) :- rname(R),concept(C).
 
 /*
  * fonction de remplacement reccuressive
+ *  remplacer de manière récursive les identificateurs de concepts complexes par leur
+définition
  */
 recc_replace(C_origin, C_origin) :- concept(C_origin).
 recc_replace(and(C1,C2),C_target) :- recc_replace(C1,C_temp1), recc_replace(C2,C_temp2), recc_replace(and(C_temp1,C_temp2),C_target).
@@ -127,6 +139,7 @@ tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
 	iname(I),
 	literal(C).
+
 /*traitement existe*/
 tri_Abox([inst(I,some(R,C))],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-
 	tri_Abox([],Lie,Lpt,Li,Lu,Ls),
@@ -146,6 +159,7 @@ tri_Abox([inst(I,all(R,C))|Abi],[(I,all(R,C))|Lie],Lpt,Li,Lu,Ls):-
 /* traitement and*/
 tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
 	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+
 tri_Abox([inst(I,and(C1,C2))|Abi],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
 
@@ -157,10 +171,64 @@ tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
-	complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
-complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
+		write('Lie'),
+	nl,
 	write(Lie),
+	nl,
+	write('Lpt'),
+	nl,
 	write(Lpt),
+	nl,
+	write('Li'),
+	nl,
 	write(Li),
+	nl,
+	write('Lu'),
+	nl,
 	write(Lu),
-	write(Ls).
+	nl,
+	write('Ls'),
+	nl,
+	write(Ls),
+	nl,
+	write('Abr'),
+	write(Abr),
+	member( (I,and(C1,C2)) , Li),
+	complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
+   
+
+complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
+	write('Lie'),
+	nl,
+	write(Lie),
+	nl,
+	write('Lpt'),
+	nl,
+	write(Lpt),
+	nl,
+	write('Li'),
+	nl,
+	write(Li),
+	nl,
+	write('Lu'),
+	nl,
+	write(Lu),
+	nl,
+	write('Ls'),
+	nl,
+	write(Ls),
+	nl,
+	write('Abr'),
+	write(Abr).
+	
+	
+/*AND*/
+transformation_and(Lie,Lpt,Li,Lu,Ls,Abr)  :- 
+	/*member( (inst(I),and(C1,C2)) , Li)*/
+	/*add to abe */
+
+   
+    concat(Abr,[inst(a,C1),inst(a,C2)],Abr).
+
+
+
