@@ -169,7 +169,15 @@ tri_Abox([inst(I,or(C1,C2))],Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls):-
 tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
 
+tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
 
+
+
+
+/*****************************************************/
+/*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
+/*****************************************************/
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
 	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
@@ -204,14 +212,17 @@ complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
 /*****************************************************/
 /* transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)*/
 /*****************************************************/
-%adds in Abox a:C1,a:C2 for every instance with an end
-%transformation_and([(I,and(C1,C2))|Li])  :- concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),nl,write(Z1),transformation_and(Z1) .
-%resolution(Lie,Lpt,Z1,Lu,Ls,Abr)
+%adds in Abox a:C1,a:C2 for every instance with an and
 
-transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),nl,write(Z1),transformation_and(Lie,Lpt,Z1,Lu,Ls,Abr) .
+%Transformation and, ajouter a Abe l'instance;
+transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- 
+	concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),transformation_and(Lie,Lpt,Z1,Lu,Ls,Abr).
+% si on trouve plus de (I,and(C1,C2), on change la Abox )
+transformation_and(Lie,Lpt,[iname(I),inst(I,C1),inst(I,C2)|Li],Lu,Ls,Abr)  :- 
+
+	concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),nl,write(Z1),resolution(Lie,Lpt,Z1,Lu,Ls,Abr) .
 
 
-tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
-	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+
 
 
