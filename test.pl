@@ -171,30 +171,9 @@ tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
-		write('Lie'),
-	nl,
-	write(Lie),
-	nl,
-	write('Lpt'),
-	nl,
-	write(Lpt),
-	nl,
-	write('Li'),
-	nl,
-	write(Li),
-	nl,
-	write('Lu'),
-	nl,
-	write(Lu),
-	nl,
-	write('Ls'),
-	nl,
-	write(Ls),
-	nl,
-	write('Abr'),
-	write(Abr),
-	member( (I,and(C1,C2)) , Li),
-	complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
+	complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
+	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
+	transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
    
 
 complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
@@ -222,13 +201,17 @@ complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	write(Abr).
 	
 	
-/*AND*/
-transformation_and(Lie,Lpt,Li,Lu,Ls,Abr)  :- 
-	/*member( (inst(I),and(C1,C2)) , Li)*/
-	/*add to abe */
+/*****************************************************/
+/* transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)*/
+/*****************************************************/
+%adds in Abox a:C1,a:C2 for every instance with an end
+%transformation_and([(I,and(C1,C2))|Li])  :- concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),nl,write(Z1),transformation_and(Z1) .
+%resolution(Lie,Lpt,Z1,Lu,Ls,Abr)
 
-   
-    concat(Abr,[inst(a,C1),inst(a,C2)],Abr).
+transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),nl,write(Z1),transformation_and(Lie,Lpt,Z1,Lu,Ls,Abr) .
 
+
+tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
 
 
