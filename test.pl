@@ -189,7 +189,7 @@ tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
 /*****************************************************/
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
-%resolution([],[],[],[],[],Abr).
+resolution([],[],[],[],Ls,[]).
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
 	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
@@ -241,17 +241,16 @@ tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
 transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- concat(Ls,[inst(I,C1),inst(I,C2)],Z1),transformation_and(Lie,Lpt,Li,Lu,Z1,Abr).
 
 
-
-
 % si on trouve plus de (I,and(C1,C2), on change la Abox )
-transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,Z),write(Z).
-%resolution(Lie,Lpt,[],Lu,Ls,Abr) .
+transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,UniqueLs),resolution(Lie,Lpt,[],Lu,UniqueLs,Abr).
 	
 /*****************************************************/
 /* Test clash */
 /*****************************************************/
 %si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
+testclash(Lie,Lpt,Li,Lu,[],Abr).
+testclash(Lie,Lpt,Li,Lu,[inst(I,C1)|Ls],Abr) :- \+ memberchk(inst(I,not(C1)),Ls),!,testclash(Lie,Lpt,Li,Lu,Ls,Abr) .
 
-%TestClash(Lie,Lpt,Li,Lu,Ls,Abr) :- %rehcer dans les listes une inst du genre(inst(a,C) inst(a,nonC))
+%rehcer dans les listes une inst du genre(inst(a,C) inst(a,nonC))
 % si on trouve , !
 
