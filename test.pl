@@ -9,6 +9,10 @@ prog :-
 
 premiere_etape(Tbox,Abi,Abr) :- setof((X,Y), equiv(X,Y),Tbox),setof((X,Y), inst(X,Y),Abi),setof((X,Y,Z), instR(X,Y,Z),Abr).
 
+
+/*****************************************************/
+/*Partie 2 : Validation des propositions*/
+/*****************************************************/
 deuxieme_etape(Abi,Abi1,Tbox) :-
 	saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox).
 
@@ -125,12 +129,19 @@ recc_replace(C_origin,C_target) :- equiv(C_origin,X), recc_replace(X,C_target).
 literal(X) :- cnamea(X).
 literal(X) :- not(Y) = X , literal(Y).
 
+/*****************************************************/
+/*Partie 3 : Tri et resolution */
+/*****************************************************/
 troisieme_etape(Abi,Abr) :-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
   resolution(Lie,Lpt,Li,Lu,Ls,Abr),
 	nl,
 	write('Youpiiiiii, on a demontre la proposition initiale !!!').
 
+
+/*****************************************************/
+/*tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls)*/
+/*****************************************************/
 /*traitement des litteraux*/
 tri_Abox([],[],[],[],[],[]).
 tri_Abox([(I,C)],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
@@ -178,6 +189,7 @@ tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
 /*****************************************************/
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
+%resolution([],[],[],[],[],Abr).
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
 	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
@@ -208,21 +220,38 @@ complete_some(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	write('Abr'),
 	write(Abr).
 	
-	
+
+
+
+tri_Abox([(I,C)],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls), literal(C), iname(I).
+tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
+	iname(I),
+	literal(C).
+
 /*****************************************************/
-/* transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)*/
+/* transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)*/
 /*****************************************************/
 %adds in Abox a:C1,a:C2 for every instance with an and
 
 %Transformation and, ajouter a Abe l'instance;
-transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- 
-	concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),transformation_and(Lie,Lpt,Z1,Lu,Ls,Abr).
+
+
+transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- concat(Ls,[inst(I,C1),inst(I,C2)],Z1),transformation_and(Lie,Lpt,Li,Lu,Z1,Abr).
+
+
+
+
 % si on trouve plus de (I,and(C1,C2), on change la Abox )
-transformation_and(Lie,Lpt,[iname(I),inst(I,C1),inst(I,C2)|Li],Lu,Ls,Abr)  :- 
+transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,Z),write(Z).
+%resolution(Lie,Lpt,[],Lu,Ls,Abr) .
+	
+/*****************************************************/
+/* Test clash */
+/*****************************************************/
+%si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
 
-	concat(Li,[iname(I),inst(I,C1),inst(I,C2)],Z1),nl,write(Z1),resolution(Lie,Lpt,Z1,Lu,Ls,Abr) .
-
-
-
-
+%TestClash(Lie,Lpt,Li,Lu,Ls,Abr) :- %rehcer dans les listes une inst du genre(inst(a,C) inst(a,nonC))
+% si on trouve , !
 

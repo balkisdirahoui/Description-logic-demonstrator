@@ -4,6 +4,7 @@ concat([X|Y],L1,[X|L2]) :- concat(Y,L1,L2).
 enleve(X,[X|L],L) :-!.
 enleve(X,[Y|L],[Y|L2]) :- enleve(X,L,L2).
 
+
 genere(Nom) :-
 		compteur(V),nombre(V,L1),
 		concat([105,110,115,116],L1,L2),
@@ -48,3 +49,17 @@ nnf(or(C1,C2),or(NC1,NC2)):- nnf(C1,NC1), nnf(C2,NC2),!.
 nnf(some(R,C),some(R,NC)):- nnf(C,NC),!.
 nnf(all(R,C),all(R,NC)) :- nnf(C,NC),!.
 nnf(X,X).
+unique([],[]).
+unique([A],[A]).
+unique([A,B|C],D) :- delete(A,[B|C],E),
+unique(E,F),
+append(A,F,D).
+
+append(A,B,B) :- member(A,B),!.
+append(A,B,[A|B]).
+
+
+ delete(_,[],[]).
+delete(A,[A],[]).
+delete(A,[A|B],B).
+ delete(A,[B|C],[B|D]) :- delete(A,C,D), !.
