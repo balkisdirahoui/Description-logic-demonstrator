@@ -246,11 +246,12 @@ transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,UniqueLs),resolution(Lie,
 	
 /*****************************************************/
 /* Test clash */
-/*****************************************************/
 %si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
-testclash(Lie,Lpt,Li,Lu,[],Abr).
-testclash(Lie,Lpt,Li,Lu,[inst(I,C1)|Ls],Abr) :- \+ memberchk(inst(I,not(C1)),Ls),!,testclash(Lie,Lpt,Li,Lu,Ls,Abr) .
+testclash([]).
+%mettre en nnf pour les cas , exp (non(non(personne)))
+/*****************************************************/
 
-%rehcer dans les listes une inst du genre(inst(a,C) inst(a,nonC))
-% si on trouve , !
+testclash([inst(I,C1)|Ls]) :-nnf(not(C1),Z), \+ memberchk(inst(I,Z),Ls),!,testclash(Ls).
+
+
 
