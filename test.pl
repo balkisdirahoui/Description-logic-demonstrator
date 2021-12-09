@@ -247,10 +247,11 @@ transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,UniqueLs),resolution(Lie,
 /*****************************************************/
 /* Test clash */
 %si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
-testclash([]).
+
 %mettre en nnf pour les cas , exp (non(non(personne)))
 /*****************************************************/
-
+%exemple jeu de test (voir plus dans rapport ): testclash([inst(david,not(personne)),inst(david,personne)])
+testclash([]).
 testclash([inst(I,C1)|Ls]) :-nnf(not(C1),Z), \+ memberchk(inst(I,Z),Ls),!,testclash(Ls).
 
 
