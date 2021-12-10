@@ -22,10 +22,10 @@ rname(aEcrit).
 rname(aEdite).
 rname(aEnfant).
 inst(michelAnge,personne).
-inst(david,sculpture).
 inst(sonnets,livre).
 inst(vinci,personne).
 inst(joconde,objet).
+inst(vinci, sculpteur).
 instR(michelAnge, david, aCree).
 instR(michelAnge, sonnets, aEcrit).
 instR(vinci, joconde, aCree).

@@ -227,6 +227,6 @@ deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
 	deduction_all(Lie,Lpt,Li,Lu,Ls_after,Abr_after),
 	enleve((I,B,R), Abr,Abr_after),
 	concat([(B,C)],Ls,Ls_after).
-	
+
 
 evolue((2,B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
