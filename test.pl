@@ -119,9 +119,10 @@ recc_replace(C_origin,C_target) :- equiv(C_origin,X), recc_replace(X,C_target).
 troisieme_etape(Abi,Abr) :-
 	/*simplify_Abox(Abi),*/
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
+	write(Abi),
 	resolution(Lie,Lpt,Li,Lu,Ls,Abr),
 	nl,
-	write('Youpiiiiii, on a demontre la proposition initiale !!!').
+	write('Youpiiiiii, on a demontre la proposition initiale!!!').
 
 literal(X) :- cnamea(X).
 literal(X) :- not(Y) = X , literal(Y).
@@ -129,12 +130,14 @@ literal(X) :- not(Y) = X , literal(Y).
 
 /*traitement des litteraux*/
 tri_Abox([],[],[],[],[],[]).
-tri_Abox([inst(I,C)],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
+tri_Abox([inst(I,C)],Lie,Lpt,Li,Lu,[inst(I,C)|Ls]):-
 	tri_Abox([],Lie,Lpt,Li,Lu,Ls), literal(C), iname(I).
-tri_Abox([inst(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
+tri_Abox([inst(I,C)|Abi],Lie,Lpt,Li,Lu,[inst(I,C)|Ls]):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
 	iname(I),
 	literal(C).
+
+
 /*traitement existe*/
 tri_Abox([inst(I,some(R,C))],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-
 	tri_Abox([],Lie,Lpt,Li,Lu,Ls),
@@ -185,10 +188,6 @@ resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	/*test_clash()*/
 	Lpt \==[],
 	deduction_all(Lie,Lpt,Li,Lu,Ls,Abr).
-	/*evolution
-	affiche_evolution
-	resolution
-	*/
 
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	test_clash()
@@ -202,31 +201,70 @@ resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 complete_some([],Lpt,Li,Lu,Ls,Abr).
 
 complete_some([(I,some(R,C))],Lpt,Li,Lu,Ls,Abr) :-
-	complete_some([],Lpt,Li,Lu,Ls_after,Abr_after),
 	concept(C), rname(R), iname(I), genere(B),
-	concat([instR(I,B,R)],Abr,Abr_after),
-	concat([(B,C)],Ls,Ls_after).
-
+	evolue(inst(B,C),[],Lpt,Li,Lu,Ls,[],Lpt1,Li1,Lu1,Ls1),
+	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
 complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr) :-
-	complete_some(Lie,Lpt,Li,Lu,Ls_after,Abr_after),
 	concept(C), rname(R), iname(I), genere(B),
-	concat([instR(I,B,R)],Abr,Abr_after),
-	concat([(B,C)],Ls,Ls_after).
-
+	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie,Lpt1,Li1,Lu1,Ls1),
+	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
 /*test michelAnge, some(aCree,sculpture)*/
-deduction_all(Lie,[],Li,Lu,Ls,Abr).
 
 deduction_all(Lie,[(I,all(R,C))],Li,Lu,Ls,Abr) :-
-	member(instR(I,B,R), Abr), iname(I),iname(B),concept(C),rname(R),
-	deduction_all(Lie,[],Li,Lu,Ls_after,Abr_after),
-	enleve(instR(I,B,R), Abr,Abr_after),
-	concat([(B,C)],Ls,Ls_after).
-
+	member((I,B,R), Abr),
+	iname(I),iname(B),concept(C),rname(R),
+	evolue(inst(B,C),Lie,[],Li,Lu,Ls,Lie1,[],Li1,Lu1,Ls1),
+	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
 deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
-	member((I,B,R), Abr), iname(I),iname(B),concept(C),rname(R),
-	deduction_all(Lie,Lpt,Li,Lu,Ls_after,Abr_after),
-	enleve((I,B,R), Abr,Abr_after),
-	concat([(B,C)],Ls,Ls_after).
-	
+	member((I,B,R), Abr),
+	iname(I),iname(B),concept(C),rname(R),
+	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt,Li1,Lu1,Ls1),
+	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
+/*ajoute a la abox la formule (b,c) et retire le premier element de la liste Lpt*/
 
-evolue((2,B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+/*evolution d'un literal*/
+evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+	literal(C),
+	Lie = Lie1,
+	Lpt = Lpt1,
+	Li = Li1,
+	Lu = Lu1,
+	concat([inst(B,C)],Ls,Ls1).
+
+
+/*evolution d'un or*/
+evolue(inst(B,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+	concept(C1),concept(C2),
+	Lie = Lie1,
+	Lpt = Lpt1,
+	Li = Li1,
+	Ls = Ls1,
+	concat([inst(B,or(C1,C2))],Lu,Lu1).
+
+/*evolution d'un and*/
+evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+	concept(C1),concept(C2),
+	Lie = Lie1,
+	Lpt = Lpt1,
+	Lu = Lu1,
+	Ls = Ls1,
+	concat([inst(B,and(C1,C2))],Li,Li1).
+
+/*evolution d'un all*/
+evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+	concept(C),
+	Lie = Lie1,
+	Lu = Lu1,
+	Li = Li1,
+	Ls = Ls1,
+	concat([inst(B,all(R,C))],Lpt,Lpt1).
+
+
+/*evolution d'un some*/
+evolue(inst(B,some(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+	concept(C),
+	Lu = Lu1,
+	Lpt = Lpt1,
+	Li = Li1,
+	Ls = Ls1,
+	concat([inst(B,some(R,C))],Lie,Lie1).
