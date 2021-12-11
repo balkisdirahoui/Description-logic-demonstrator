@@ -25,7 +25,6 @@ inst(michelAnge,personne).
 inst(sonnets,livre).
 inst(vinci,personne).
 inst(joconde,objet).
-inst(vinci, sculpteur).
 instR(michelAnge, david, aCree).
 instR(michelAnge, sonnets, aEcrit).
 instR(vinci, joconde, aCree).
