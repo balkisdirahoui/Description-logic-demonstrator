@@ -187,7 +187,7 @@ tri_Abox([inst(I,or(C1,C2))],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
 
-resolution([],[],[],[],Ls,Abr).
+
 
 
 /*****************************************************/
@@ -223,7 +223,9 @@ resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	affiche_evolution
 	resolution
 	*/
-
+/*****************************************************/
+/* complete_some([],Lpt,Li,Lu,Ls,Abr)*/
+/*****************************************************/
 /*test david, all(aEcrit,livre)*/
 complete_some([],Lpt,Li,Lu,Ls,Abr).
 
@@ -249,7 +251,9 @@ complete_some([inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr) :-
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt,Li1,Lu1,Abr1),
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr1).
 
-
+/*****************************************************/
+/* deduction_all(Lie,[],Li,Lu,Ls,Abr)*/
+/*****************************************************/
 
 /*test michelAnge, some(aCree,sculpture)*/
 deduction_all(Lie,[],Li,Lu,Ls,Abr).
@@ -275,6 +279,46 @@ deduction_all(Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
 /*ajoute a la abox la formule (b,c) et retire le premier element de la liste Lpt*/
 
+/*****************************************************/
+/* transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)*/
+/*****************************************************/
+%adds in Abox a:C1,a:C2 for every instance with an and
+
+
+transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- concat(Ls,[inst(I,C1),inst(I,C2)],Z1),transformation_and(Lie,Lpt,Li,Lu,Z1,Abr).
+% si on trouve plus de (I,and(C1,C2), on change la Abox )
+transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,UniqueLs),resolution(Lie,Lpt,[],Lu,UniqueLs,Abr).
+
+
+/*****************************************************/
+/* Test clash */
+%si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
+
+%mettre en nnf pour les cas , exp (non(non(personne)))
+/*****************************************************/
+%exemple jeu de test (voir plus dans rapport ): testclash([inst(david,not(personne)),inst(david,personne)])
+testclash([]).
+testclash([inst(I,C1)|Ls]) :-nnf(not(C1),Z), \+ memberchk(inst(I,Z),Ls),!,testclash(Ls).
+
+
+
+/*****************************************************/
+/* transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr)*/
+%adds in Abox  a:C1,a:C2 for  and creates two branches of the table.
+/*****************************************************/
+
+transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :- 
+
+concat(Ls,[inst(I,C1)],Z1),unique(Z1,UniqueLs1),write(UniqueLs1),nl, 
+concat(Ls,[inst(I,C2)],Z2),unique(Z2,UniqueLs2),write(UniqueLs2),nl,write(UniqueLs2),
+resolution(Lie,Lpt,Li,[],UniqueLs1,Abr),
+resolution(Lie,Lpt,Li,[],UniqueLs2,Abr),
+transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
+
+/*****************************************************/
+/* EVOLUTION*/
+
+/*****************************************************/
 /*evolution d'un literal*/
 evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	literal(C),
