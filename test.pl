@@ -292,9 +292,6 @@ transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,UniqueLs),resolution(Lie,
 
 /*****************************************************/
 /* Test clash */
-%si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
-
-%mettre en nnf pour les cas , exp (non(non(personne)))
 /*****************************************************/
 %exemple jeu de test (voir plus dans rapport ): testclash([inst(david,not(personne)),inst(david,personne)])
 testclash([]).
@@ -304,7 +301,6 @@ testclash([inst(I,C1)|Ls]) :-nnf(not(C1),Z), \+ memberchk(inst(I,Z),Ls),!,testcl
 
 /*****************************************************/
 /* transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr)*/
-%adds in Abox  a:C1,a:C2 for  and creates two branches of the table.
 /*****************************************************/
 
 transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :- 
@@ -317,7 +313,6 @@ transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
 
 /*****************************************************/
 /* EVOLUTION*/
-
 /*****************************************************/
 /*evolution d'un literal*/
 evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
@@ -367,6 +362,9 @@ evolue(inst(B,some(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	concat([inst(B,some(R,C))],Lie,Lie1).
 
 
+/*****************************************************/
+/* affiche_role()*/
+/*****************************************************/
 affiche_role(instR(A,B,R)):- write(A), tab(1) , write(R), tab(1) , write(B).
 
 affiche_literal(not(C)):- write("¬("), write(C),write(")"),!.
