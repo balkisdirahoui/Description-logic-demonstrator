@@ -219,15 +219,29 @@ resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
 
 /*****************************************************/
+/* Test clash */
+/*****************************************************/
+%exemple jeu de test (voir plus dans rapport ): testclash([inst(david,not(personne)),inst(david,personne)])
+testclash([]).
+testclash([inst(I,C1)|Ls]) :-
+	nnf(not(C1),Z), 
+    \+ memberchk(inst(I,Z),Ls),
+    testclash(Ls).
+
+
+/*****************************************************/
 /* complete_some([],Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
 /*test david, all(aEcrit,livre)*/
-complete_some([],Lpt,Li,Lu,Ls,Abr).
 
+complete_some([],Lpt,Li,Lu,Ls,Abr).
 complete_some([inst(I,some(R,C))],Lpt,Li,Lu,Ls,Abr) :-
-	write("completer la Abox a partir de la propostion :"),
-	affiche_instance(inst(I,some(R,C))),
+	
 	nl,
+	write("**************************************************************************************************"),nl,
+	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,some(R,C))),nl,
+	write("**************************************************************************************************"),	
+	nl,	
 	genere(B),
 	concat([instR(I,B,R)],Abr,Abr1),
 	concept(C), rname(R), iname(I), genere(B),
@@ -236,8 +250,10 @@ complete_some([inst(I,some(R,C))],Lpt,Li,Lu,Ls,Abr) :-
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr1).
 
 complete_some([inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr) :-
-	write("completer la Abox a partir de la propostion :"),
-	affiche_instance(inst(I,some(R,C))),
+	nl,
+	write("**************************************************************************************************"),nl,
+	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,some(R,C))),nl,
+	write("**************************************************************************************************"),	
 	nl,
 	concept(C), rname(R), iname(I), genere(B),
 	genere(B),
@@ -254,13 +270,11 @@ complete_some([inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr) :-
 deduction_all(Lie,[],Li,Lu,Ls,Abr).
 
 deduction_all(Lie,[inst(I,all(R,C))],Li,Lu,Ls,Abr) :-
-	nl,
-	write("**************************************************************************************************"),
-	nl,
-	write("          Evolution de la Abox pour la propostion :"),
-	affiche_instance(inst(I,all(R,C))),
-	nl,
-	write("**************************************************************************************************"),	nl,
+    nl,
+	write("**************************************************************************************************"),nl,
+	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,all(R,C))),nl,
+	write("**************************************************************************************************"),	
+	nl,	
 	member(instR(I,B,R), Abr),
 	iname(I),iname(B),concept(C),rname(R),
 	evolue(inst(B,C),Lie,[],Li,Lu,Ls,Lie1,[],Li1,Lu1,Ls1),
@@ -269,14 +283,10 @@ deduction_all(Lie,[inst(I,all(R,C))],Li,Lu,Ls,Abr) :-
 
 deduction_all(Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
 	nl,
-	write("*********************************"),
-	nl,
-	write("Evolution de la Abox pour la propostion :"),
-	nl,
-	write("*********************************"),
-	nl,
-	affiche_instance(inst(I,all(R,C))),
-	nl,
+	write("**************************************************************************************************"),nl,
+	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,all(R,C))),nl,
+	write("**************************************************************************************************"),	
+	nl,	
 	member(instR(I,B,R), Abr),
 	iname(I),iname(B),concept(C),rname(R),
 	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt,Li1,Lu1,Ls1),
@@ -288,75 +298,47 @@ deduction_all(Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
 /* transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)*/
 /*****************************************************/
 %test : (david,or(personne,sculpture))
-
 transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :-
     nl,
-	write("**************************************************************************************************"),
-	nl,
-	write("          Evolution de la Abox pour la propostion :"),
-	affiche_instance(inst(I,and(C1,C2))),
-	nl,
+	write("**************************************************************************************************"),nl,
+	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,and(C1,C2))),nl,
 	write("**************************************************************************************************"),	
 	nl,	
 	evolue(inst(I,C1),Lie,Lpt,[],Lu,Ls,Lie1,Lpt1,[],Lu1,Ls1),
 	evolue(inst(I,C2),Lie,Lpt,[],Lu,Ls1,Lie1,Lpt1,[],Lu1,Ls2),
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie1,Lpt1,Li1,Lu1,Abr),
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls2,[]).
-
-/*****************************************************/
-/* Test clash */
-/*****************************************************/
-%exemple jeu de test (voir plus dans rapport ): testclash([inst(david,not(personne)),inst(david,personne)])
-testclash([]).
-testclash([inst(I,C1)|Ls]) :-
-	nnf(not(C1),Z), 
-    \+ memberchk(inst(I,Z),Ls),
-    testclash(Ls).
+/*ajoute a la abox les instances (I,C1) et (I,C2) retire le premier element de la liste Li*/
 
 
 
 /*****************************************************/
 /* transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr)*/
 /*****************************************************/
-  %test (david,and(personne,sculpture))
+%test (david,and(personne,sculpture))
+
 transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
-  
 	nl,
-	write("**************************************************************************************************"),
-	nl,
-	write("          Evolution de la Abox pour la propostion :"),
-	affiche_instance(inst(I,or(C1,C2))),
-	nl,
-	write("**************************************************************************************************"),	
-	nl,	
+	write("***********************************************************************%"),nl,
+	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,or(C1,C2))),nl,
+	write("***********************************************************************"),	nl,nl,	
+	
 	evolue(inst(I,C1),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls1),
-	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),
-	nl,
-	write("                       Branche 1                           "), 
-
-	nl,
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),nl,
+	write("                       Branche 1                           "), nl,
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,
-
-	nl
-	,
+	nl,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,[]),
 	evolue(inst(I,C2),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls2),
+
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),
 	nl,
-	write("                        Branche 2                           "), 
-
-	nl,
+	write("                        Branche 2                           "), nl,
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,
-
-	nl
-	,
+	nl,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie1,Lpt1,Li1,Lu1,Abr),
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls2,[]).
-
-
-
-
 
 
 /*****************************************************/
@@ -372,7 +354,6 @@ evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	concat([inst(B,C)],Ls,Z),
 	unique(Z,Ls1)
 	.
-
 
 /*evolution d'un or*/
 evolue(inst(B,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
