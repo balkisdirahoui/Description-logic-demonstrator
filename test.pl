@@ -8,9 +8,17 @@ prog :-
 	troisieme_etape(Abi1,Abr).
 
 premiere_etape(Tbox,Abi,Abr) :- setof((X,Y), equiv(X,Y),Tbox),setof((X,Y), inst(X,Y),Abi),setof((X,Y,Z), instR(X,Y,Z),Abr).
+%(auteur, and(personne, some(aEcrit, livre)))
+%autoref((C,D),Tbox) :- write(C),nl,write(D).
 
-
-/*****************************************************/
+autoref((C,all(R,C2)),Tbox) :- write(C),nl,write(R)
+,nl,write(C2),[(C2,some(R,C3))|Tbox], +\ C2 ==C3,!,autoref((C,all(R,C2)),Tbox) .
+%autoref((C,D),[]). 
+	
+	
+	
+	
+	/*****************************************************/
 /*Partie 2 : Validation des propositions*/
 /*****************************************************/
 deuxieme_etape(Abi,Abi1,Tbox) :-
@@ -191,8 +199,8 @@ tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-
 /*****************************************************/
 resolution([],[],[],[],Ls,[]).
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
-	complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
-	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
+	%complete_some(Lie,Lpt,Li,Lu,Ls,Abr),
+	%transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),
 	transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
    
 
@@ -235,15 +243,12 @@ tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-
 /*****************************************************/
 %adds in Abox a:C1,a:C2 for every instance with an and
 
-%Transformation and, ajouter a Abe l'instance;
-
 
 transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :- concat(Ls,[inst(I,C1),inst(I,C2)],Z1),transformation_and(Lie,Lpt,Li,Lu,Z1,Abr).
-
-
 % si on trouve plus de (I,and(C1,C2), on change la Abox )
 transformation_and(Lie,Lpt,[],Lu,Ls,Abr)  :- unique(Ls,UniqueLs),resolution(Lie,Lpt,[],Lu,UniqueLs,Abr).
-	
+
+
 /*****************************************************/
 /* Test clash */
 %si on trouve inst(a,C) et inst(a,nonC) dans la Abox, clash
@@ -256,3 +261,20 @@ testclash([inst(I,C1)|Ls]) :-nnf(not(C1),Z), \+ memberchk(inst(I,Z),Ls),!,testcl
 
 
 
+/*****************************************************/
+/* transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr)*/
+%adds in Abox  a:C1,a:C2 for  and creates two branches of the table.
+/*****************************************************/
+
+/*transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :- 
+
+concat(Ls,[inst(I,C1)],Z1),unique(Z1,UniqueLs1),write(UniqueLs1),nl, 
+concat(Ls,[inst(I,C2)],Z2),unique(Z2,UniqueLs2),write(UniqueLs2),nl,write(UniqueLs2),
+resolution(Lie,Lpt,Li,[],UniqueLs1,Abr),
+resolution(Lie,Lpt,Li,[],UniqueLs2,Abr),
+transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
+
+
+
+transformation_or(Lie,Lpt,Li,[],Ls,Abr) :- write('we're done lol).
+	*/
