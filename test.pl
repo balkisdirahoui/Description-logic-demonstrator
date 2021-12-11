@@ -318,8 +318,10 @@ testclash([inst(I,C1)|Ls]) :-
 /*****************************************************/
 /* transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr)*/
 /*****************************************************/
+  %test (david,and(personne,sculpture))
 transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
-    nl,
+  
+	nl,
 	write("**************************************************************************************************"),
 	nl,
 	write("          Evolution de la Abox pour la propostion :"),
@@ -328,13 +330,25 @@ transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
 	write("**************************************************************************************************"),	
 	nl,	
 	evolue(inst(I,C1),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls1),
-	write('Branche 1 :'),
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),
+	nl,
+	write("                       Branche 1                           "), 
+
+	nl,
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,
+
 	nl
 	,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,[]),
 	evolue(inst(I,C2),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls2),
-	write('Branche 2 :'),
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),
+	nl,
+	write("                        Branche 2                           "), 
+
+	nl,
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,
+
 	nl
 	,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie1,Lpt1,Li1,Lu1,Abr),
@@ -344,14 +358,7 @@ transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
 
 
 
-/*
-transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :- 
-concat(Ls,[inst(I,C1)],Z1),unique(Z1,UniqueLs1),write(UniqueLs1),nl, 
-concat(Ls,[inst(I,C2)],Z2),unique(Z2,UniqueLs2),write(UniqueLs2),nl,write(UniqueLs2),
-resolution(Lie,Lpt,Li,[],UniqueLs1,Abr),
-resolution(Lie,Lpt,Li,[],UniqueLs2,Abr),
-transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
-*/
+
 /*****************************************************/
 /* EVOLUTION*/
 /*****************************************************/
@@ -423,51 +430,115 @@ affiche_concept(all(R,C)) :- write("("),write("∀"), write(R) , write("."),affi
 affiche_instance(inst(B,C)) :- write(B), write(":"), affiche_concept(C),!.
 
 affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu2, Abr2) :-
-	write("contenu de Ls avant l'application de la regle:["),nl,
+	write("contenu de Ls avant l'application de la regle:"),nl,
+	write("Ls = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Ls1),
 	write("]"),
 	nl,
-	write("contenu de Ls apres l'application de la regle:["),nl,
+	write("contenu de Ls apres l'application de la regle:"),nl,
+	write("Ls_Up = "),
+	write("["),
+	nl
+	,
+	nl
+	,
 	affiche_liste_inst(Ls2),
 	write("]"),
 	nl,
-	write("contenu de Lie avant l'application de la regle:["),nl,
+	write("contenu de Lie avant l'application de la regle:"),nl,
+	write("Lie = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Lie1),
 	write("]"),
 	nl,
-	write("contenu de Lie apres l'application de la regle:["),nl,
+	write("contenu de Lie apres l'application de la regle:"),nl,
+	write("Lie_Up = "),
+	write("["),
+	nl
+	,
+
 	affiche_liste_inst(Lie2),
 	write("]"),
 	nl,
-	write("contenu de Lpt avant l'application de la regle:["),nl,
+	
+	nl
+	,
+	write("contenu de Lpt avant l'application de la regle:"),nl,
+	write("Lpt = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Lpt1),
 	write("]"),
 	nl,
-	write("contenu de Lpt apres l'application de la regle:["),nl,
+	write("contenu de Lpt apres l'application de la regle:"),nl,
+	write("Lpt_Up = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Lpt2),
 	write("]"),
 	nl,
-	write("contenu de Li avant l'application de la regle:["),nl,
+	
+	nl
+	,
+	write("contenu de Li avant l'application de la regle:"),nl,
+	write("Li = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Li1),
 	write("]"),
 	nl,
-	write("contenu de Li apres l'application de la regle:["),nl,
+	write("contenu de Li apres l'application de la regle:"),nl,
+	write("Li_Up = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Li2),
 	write("]"),
 	nl,
-	write("contenu de Lu avant l'application de la regle:["),nl,
+	
+	nl
+	,
+	write("contenu de Lu avant l'application de la regle:"),nl,
+	write("Lu = "),
+	write("["),
+	nl
+	,
 	affiche_liste_inst(Lu1),
 	write("]"),
 	nl,
-	write("contenu de Lu apres l'application de la regle:["),nl,
+	write("contenu de Lu apres l'application de la regle:"),nl,
+	write("Lu_Up = "),
+	write("["),
+	nl
+	,
+
 	affiche_liste_inst(Lu2),
 	write("]"),
 	nl,
-	write("contenu de Abr avant l'application de la regle:["),nl,
+	
+	nl
+	,
+	write("contenu de Abr avant l'application de la regle:"),nl,
+	write("Abr = "),
+	write("["),
+	nl
+	,
 	affiche_liste_role(Abr1),
 	write("]"),
 	nl,
-	write("contenu de Abr apres l'application de la regle:["),nl,
+	write("contenu de Abr apres l'application de la regle:"),nl,
+	write("Abr_Up = "),
+	write("["),
+	nl
+	,
 	affiche_liste_role(Abr2),
 	write("]"),
 	nl.
