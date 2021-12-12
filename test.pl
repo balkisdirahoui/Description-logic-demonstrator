@@ -1,54 +1,4 @@
-/*
-:-[box].
-:-[utils].
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***************************************************BOX**********************************************/
-equiv(sculpteur,and(personne,some(aCree,sculpture))).
-equiv(auteur,and(personne,some(aEcrit,livre))).
-equiv(editeur,and(personne,and(not(some(aEcrit,livre)),some(aEdite,livre)))).
-equiv(parent,and(personne,some(aEnfant,anything))).
-
-cnamea(personne).
-cnamea(livre).
-cnamea(objet).
-cnamea(sculpture).
-cnamea(anything).
-cnamea(nothing).
-cnamena(auteur).
-cnamena(editeur).
-cnamena(sculpteur).
-cnamena(parent).
-iname(michelAnge).
-iname(david).
-iname(sonnets).
-iname(vinci).
-iname(joconde).
-rname(aCree).
-rname(aEcrit).
-rname(aEdite).
-rname(aEnfant).
-inst(michelAnge,personne).
-inst(sonnets,livre).
-inst(vinci,personne).
-inst(joconde,objet).
-instR(michelAnge, david, aCree).
-instR(michelAnge, sonnets, aEcrit).
-instR(vinci, joconde, aCree).
+:- [box].
 /***************************************************UTILS**********************************************/
 concat([],L1,L1).
 concat([X|Y],L1,[X|L2]) :- concat(Y,L1,L2).
@@ -126,16 +76,16 @@ prog :-
 	troisieme_etape(Abi1,Abr).
 
 
+/*****************************************************/
+/*Partie 1 : construction de la Abox et de la Tbox*/
+/*****************************************************/
+
 premiere_etape(Tbox,Abi,Abr) :-
+	cnamea(anything),
+	cnamea(nothing),
 	setof((X,Y), equiv(X,Y),Tbox),
 	setof(inst(X,Y), inst(X,Y),Abi),
 	setof(instR(X,Y,Z), instR(X,Y,Z),Abr).
-
-
-
-
-
-
 
 /*****************************************************/
 /*Partie 2 : Validation des propositions*/
@@ -206,10 +156,24 @@ part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox) :-
 	/* a*/
 	recc_replace(C2,C2_transformed),
 	validate_concept(C2_transformed),
+	C1 \= not(C2),
 	nnf(and(C1_transformed,C2_transformed),Prop_to_add_in_Abox),
 	genere(B),
 	write(Prop_to_add_in_Abox),
 	concat(Abi,[inst(B,Prop_to_add_in_Abox)],Abi1).
+
+part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox) :-
+	nl,
+	write('Entrez le nom du deuxieme concept:'),
+	nl,
+	read(C2),
+	/* a*/
+	recc_replace(C2,C2_transformed),
+	validate_concept(C2_transformed),
+	C1 = not(C2),
+	write("Ces deux concept sont les negations l'un de lautre, donc leur intersection est vide"),
+	exit().
+
 /*
  *
  *Verification sur l'instance
@@ -263,7 +227,6 @@ literal(X) :- cnamea(X).
 literal(X) :- not(Y) = X , literal(Y).
 
 
-
 /*****************************************************/
 /*tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls)*/
 /*****************************************************/
@@ -304,12 +267,9 @@ tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls), concept(C1), concept(C2).
 
 
-
-
 /*****************************************************/
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
-
 resolution([],[],[],[],Ls,Abr) :- not(testclash(Ls)), write("Feuille Ouverte"),nl,!.
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
@@ -451,8 +411,7 @@ evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Li = Li1,
 	Lu = Lu1,
 	concat([inst(B,C)],Ls,Temp),
-	unique(Temp,Ls1)
-	.
+	unique(Temp,Ls1).
 
 /*evolution d'un or*/
 evolue(inst(B,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
@@ -462,8 +421,7 @@ evolue(inst(B,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Li = Li1,
 	Ls = Ls1,
 	concat([inst(B,or(C1,C2))],Lu,Temp),
-	unique(Temp,Lu1)
-	.
+	unique(Temp,Lu1).
 /*evolution d'un and*/
 evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	concept(C1),concept(C2),
@@ -472,8 +430,7 @@ evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lu = Lu1,
 	Ls = Ls1,
 	concat([inst(B,and(C1,C2))],Li,Temp),
-	unique(Temp,Li1)
-	.
+	unique(Temp,Li1).
 /*evolution d'un all*/
 evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	concept(C),
@@ -482,8 +439,7 @@ evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Li = Li1,
 	Ls = Ls1,
 	concat([inst(B,all(R,C))],Lpt,Temp),
-	unique(Temp,Lpt1)
-	.
+	unique(Temp,Lpt1).
 
 
 /*evolution d'un some*/
@@ -523,41 +479,33 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	write("contenu de Ls avant l'application de la regle:"),nl,
 	write("Ls = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_inst(Ls1),
 	write("]"),
 	nl,
 	write("contenu de Ls apres l'application de la regle:"),nl,
 	write("Ls_Up = "),
 	write("["),
-	nl
-	,
-	nl
-	,
+	nl,
+	nl,
 	affiche_liste_inst(Ls2),
 	write("]"),
 	nl,
 	write("contenu de Lie avant l'application de la regle:"),nl,
 	write("Lie = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_inst(Lie1),
 	write("]"),
 	nl,
 	write("contenu de Lie apres l'application de la regle:"),nl,
 	write("Lie_Up = "),
 	write("["),
-	nl
-	,
-
+	nl,
 	affiche_liste_inst(Lie2),
 	write("]"),
 	nl,
-
-	nl
-	,
+	nl,
 	write("contenu de Lpt avant l'application de la regle:"),nl,
 	write("Lpt = "),
 	write("["),
@@ -580,55 +528,44 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	write("contenu de Li avant l'application de la regle:"),nl,
 	write("Li = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_inst(Li1),
 	write("]"),
 	nl,
 	write("contenu de Li apres l'application de la regle:"),nl,
 	write("Li_Up = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_inst(Li2),
 	write("]"),
 	nl,
-
-	nl
-	,
+	nl,
 	write("contenu de Lu avant l'application de la regle:"),nl,
 	write("Lu = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_inst(Lu1),
 	write("]"),
 	nl,
 	write("contenu de Lu apres l'application de la regle:"),nl,
 	write("Lu_Up = "),
 	write("["),
-	nl
-	,
-
+	nl,
 	affiche_liste_inst(Lu2),
 	write("]"),
 	nl,
-
-	nl
-	,
+	nl,
 	write("contenu de Abr avant l'application de la regle:"),nl,
 	write("Abr = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_role(Abr1),
 	write("]"),
 	nl,
 	write("contenu de Abr apres l'application de la regle:"),nl,
 	write("Abr_Up = "),
 	write("["),
-	nl
-	,
+	nl,
 	affiche_liste_role(Abr2),
 	write("]"),
 	nl.
