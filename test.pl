@@ -435,24 +435,21 @@ transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :-
 
 transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
 	nl,
-	write("***********************************************************************%"),nl,
+	write("***********************************************************************"),nl,
 	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,or(C1,C2))),nl,
 	write("***********************************************************************"),	nl,nl,	
 	
 	evolue(inst(I,C1),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls1),
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),nl,
 	write("                       Branche 1                           "), nl,
-	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,
-	nl,
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,nl,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),!,
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,[]),
+	
 	evolue(inst(I,C2),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls2),
-
-	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),
-	nl,
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),nl,
 	write("                        Branche 2                           "), nl,
-	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,
-	nl,
+	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,nl,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie1,Lpt1,Li1,Lu1,Abr),!,
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls2,[]).
 
@@ -478,8 +475,9 @@ evolue(inst(B,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Li = Li1,
 	Ls = Ls1,
-	concat([inst(B,or(C1,C2))],Lu,Lu1).
-
+	concat([inst(B,or(C1,C2))],Lu,Z),
+	unique(Z,Lu1)
+	.
 /*evolution d'un and*/
 evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	concept(C1),concept(C2),
@@ -487,8 +485,9 @@ evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Lu = Lu1,
 	Ls = Ls1,
-	concat([inst(B,and(C1,C2))],Li,Li1).
-
+	concat([inst(B,and(C1,C2))],Li,Z),
+	unique(Z,Li1)
+	.
 /*evolution d'un all*/
 evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	concept(C),
@@ -496,7 +495,9 @@ evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lu = Lu1,
 	Li = Li1,
 	Ls = Ls1,
-	concat([inst(B,all(R,C))],Lpt,Lpt1).
+	concat([inst(B,all(R,C))],Lpt,Z),
+	unique(Z,Lpt1)
+	.
 
 
 /*evolution d'un some*/
@@ -506,7 +507,9 @@ evolue(inst(B,some(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Li = Li1,
 	Ls = Ls1,
-	concat([inst(B,some(R,C))],Lie,Lie1).
+	concat([inst(B,some(R,C))],Lie,Z),
+	unique(Z,Lie1)
+	.
 
 
 /*****************************************************/
