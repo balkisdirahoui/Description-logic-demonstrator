@@ -1,0 +1,4 @@
+{
+    "python.linting.enabled": true,
+    "prolog.executablePath": "/usr/local/Cellar/swi-prolog/8.4.0/libexec/lib/swipl"
+}
