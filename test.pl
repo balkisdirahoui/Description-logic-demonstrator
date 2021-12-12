@@ -130,10 +130,8 @@ part_1_acquisition_prop_type1(Abi,Abi1,Tbox)	:-
 part_2_acquisition_prop_type1(I,Abi,Abi1,Tbox) :-
 	nl,
 	read(C),
-	/*a*/
 	recc_replace(C,C_transformed),
 	validate_concept(C_transformed),
-	/*b*/
 	nnf(not(C_transformed),Prop_to_add_in_Abox),
 	concat(Abi,[inst(I,Prop_to_add_in_Abox)],Abi1).
 
@@ -156,10 +154,9 @@ part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox) :-
 	/* a*/
 	recc_replace(C2,C2_transformed),
 	validate_concept(C2_transformed),
-	C1 \= not(C2),
+	C1_transformed \= not(C2),
 	nnf(and(C1_transformed,C2_transformed),Prop_to_add_in_Abox),
 	genere(B),
-	write(Prop_to_add_in_Abox),
 	concat(Abi,[inst(B,Prop_to_add_in_Abox)],Abi1).
 
 part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox) :-
@@ -170,7 +167,7 @@ part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox) :-
 	/* a*/
 	recc_replace(C2,C2_transformed),
 	validate_concept(C2_transformed),
-	C1 = not(C2),
+	C1_transformed = not(C2),
 	write("Ces deux concept sont les negations l'un de lautre, donc leur intersection est vide"),
 	exit().
 
@@ -210,7 +207,7 @@ recc_replace(and(C1,C2),C_target) :- recc_replace(C1,C_temp1), recc_replace(C2,C
 recc_replace(or(C1,C2),C_target) :- recc_replace(C1,C_temp1), recc_replace(C2,C_temp2), recc_replace(or(C_temp1,C_temp2),C_target).
 recc_replace(not(C_origin),C_target) :- recc_replace(C_origin,C_temp), recc_replace(not(C_temp),C_target).
 recc_replace(some(R,C_origin),C_target) :- recc_replace(C_origin,C_temp), recc_replace(some(R,C_temp),C_target).
-recc_replace(some(R,C_origin),C_target) :- recc_replace(C_origin,C_temp), recc_replace(all(R,C_temp),C_target).
+recc_replace(all(R,C_origin),C_target) :- recc_replace(C_origin,C_temp), recc_replace(all(R,C_temp),C_target).
 recc_replace(C_origin,C_target) :- equiv(C_origin,X), recc_replace(X,C_target).
 
 
@@ -270,7 +267,7 @@ tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 /*****************************************************/
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
-resolution([],[],[],[],Ls,Abr) :- not(testclash(Ls)), write("Feuille Ouverte"),nl,!.
+resolution([],[],[],[],Ls,Abr) :- 	not(testclash(Ls)), write("Feuille fermée"),nl,!.
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	testclash(Ls),
@@ -372,6 +369,12 @@ transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :-
 	resolution(Lie2, Lpt2,Li2,Lu2,Ls2,Abr).
 /*ajoute a la abox les instances (I,C1) et (I,C2) retire le premier element de la liste Li*/
 
+transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :-
+	evolue(inst(I,C1),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1),
+	not(testclash(Ls1)),
+	evolue(inst(I,C2),Lie1,Lpt1,Li1,Lu1,Ls1,Lie2,Lpt2,Li2,Lu2,Ls2),
+	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie2,Lpt2,Li2,Lu2,Abr),!,
+	write('Youpiiiiii, on a demontre la proposition initiale!!!'),!.
 
 
 /*****************************************************/
