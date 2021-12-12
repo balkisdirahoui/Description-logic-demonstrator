@@ -101,6 +101,7 @@ nnf(or(C1,C2),or(NC1,NC2)):- nnf(C1,NC1), nnf(C2,NC2),!.
 nnf(some(R,C),some(R,NC)):- nnf(C,NC),!.
 nnf(all(R,C),all(R,NC)) :- nnf(C,NC),!.
 nnf(X,X).
+
 unique([],[]).
 unique([A],[A]).
 unique([A,B|C],D) :- delete(A,[B|C],E),
@@ -111,10 +112,10 @@ append(A,B,B) :- member(A,B),!.
 append(A,B,[A|B]).
 
 
- delete(_,[],[]).
+delete(_,[],[]).
 delete(A,[A],[]).
 delete(A,[A|B],B).
- delete(A,[B|C],[B|D]) :- delete(A,C,D), !.
+delete(A,[B|C],[B|D]) :- delete(A,C,D), !.
 
 /***************************************************TEST**********************************************/
 compteur(1).
@@ -132,10 +133,10 @@ premiere_etape(Tbox,Abi,Abr) :-
 
 
 
-	
-	
-	
-	
+
+
+
+
 /*****************************************************/
 /*Partie 2 : Validation des propositions*/
 /*****************************************************/
@@ -206,7 +207,9 @@ part_2_acquisition_prop_type2(C1_transformed,Abi,Abi1,Tbox) :-
 	recc_replace(C2,C2_transformed),
 	validate_concept(C2_transformed),
 	nnf(and(C1_transformed,C2_transformed),Prop_to_add_in_Abox),
-	concat(Abi,[inst(X,Prop_to_add_in_Abox)],Abi1).
+	genere(B),
+	write(Prop_to_add_in_Abox),
+	concat(Abi,[inst(B,Prop_to_add_in_Abox)],Abi1).
 /*
  *
  *Verification sur l'instance
@@ -251,7 +254,6 @@ recc_replace(C_origin,C_target) :- equiv(C_origin,X), recc_replace(X,C_target).
 /*Partie 3 : Tri et resolution */
 /*****************************************************/
 troisieme_etape(Abi,Abr) :-
-	/*simplify_Abox(Abi),*/
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
 	resolution(Lie,Lpt,Li,Lu,Ls,Abr),
 	nl,
@@ -268,39 +270,38 @@ literal(X) :- not(Y) = X , literal(Y).
 /*traitement des litteraux*/
 tri_Abox([],[],[],[],[],[]).
 tri_Abox([inst(I,C)],Lie,Lpt,Li,Lu,[inst(I,C)|Ls]):-
-	tri_Abox([],Lie,Lpt,Li,Lu,Ls), literal(C), iname(I).
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls), literal(C).
 tri_Abox([inst(I,C)|Abi],Lie,Lpt,Li,Lu,[inst(I,C)|Ls]):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
-	iname(I),
 	literal(C).
 
 /*traitement existe*/
 tri_Abox([inst(I,some(R,C))],[inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-
 	tri_Abox([],Lie,Lpt,Li,Lu,Ls),
-	iname(I), concept(C), rname(R).
+	concept(C), rname(R).
 tri_Abox([inst(I,some(R,C))|Abi],[inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
-	iname(I), concept(C), rname(R).
+	 concept(C), rname(R).
 
 /*traitement quelque soit*/
 tri_Abox([inst(I,all(R,C))],Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls):-
 	tri_Abox([],Lie,Lpt,Li,Lu,Ls),
-	iname(I), concept(C), rname(R).
+	concept(C), rname(R).
 tri_Abox([inst(I,all(R,C))|Abi],Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls):-
 	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
-	iname(I), concept(C), rname(R).
+	concept(C), rname(R).
 
 /* traitement and*/
 tri_Abox([inst(I,and(C1,C2))],Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls):-
-	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls), concept(C1), concept(C2).
 tri_Abox([inst(I,and(C1,C2))|Abi],Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls):-
-	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls), concept(C1), concept(C2).
 
 /*traitement or*/
 tri_Abox([inst(I,or(C1,C2))],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
-	tri_Abox([],Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+	tri_Abox([],Lie,Lpt,Li,Lu,Ls), concept(C1), concept(C2).
 tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
-	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),iname(I), concept(C1), concept(C2).
+	tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls), concept(C1), concept(C2).
 
 
 
@@ -309,19 +310,19 @@ tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
 
-resolution([],[],[],[],Ls,[]) :- testclash(Ls) .
+resolution([],[],[],[],Ls,Abr) :- not(testclash(Ls)), write("Feuille Ouverte"),nl,!.
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	testclash(Ls),
 	Lie \== [],
 	complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
-	
+
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	testclash(Ls),
 	Li \== [],
 	transformation_and(Lie,Lpt,Li,Lu,Ls,Abr).
-	
+
 
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
@@ -340,7 +341,7 @@ resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 %exemple jeu de test (voir plus dans rapport ): testclash([inst(david,not(personne)),inst(david,personne)])
 testclash([]).
 testclash([inst(I,C1)|Ls]) :-
-	nnf(not(C1),Z), 
+	nnf(not(C1),Z),
     \+ memberchk(inst(I,Z),Ls),
     testclash(Ls).
 
@@ -351,32 +352,18 @@ testclash([inst(I,C1)|Ls]) :-
 /*test david, all(aEcrit,livre)*/
 
 complete_some([],Lpt,Li,Lu,Ls,Abr).
-complete_some([inst(I,some(R,C))],Lpt,Li,Lu,Ls,Abr) :-
-	
-	nl,
-	write("**************************************************************************************************"),nl,
-	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,some(R,C))),nl,
-	write("**************************************************************************************************"),	
-	nl,	
-	genere(B),
-	concat([instR(I,B,R)],Abr,Abr1),
-	concept(C), rname(R), iname(I), genere(B),
-	evolue(inst(B,C),[],Lpt,Li,Lu,Ls,[],Lpt1,Li1,Lu1,Ls1),
-	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt,Li1,Lu1,Abr1),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr1).
 
 complete_some([inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr) :-
 	nl,
 	write("**************************************************************************************************"),nl,
 	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,some(R,C))),nl,
-	write("**************************************************************************************************"),	
+	write("**************************************************************************************************"),
 	nl,
-	concept(C), rname(R), iname(I), genere(B),
-	genere(B),
+	concept(C), rname(R),  genere(B),
 	concat([instR(I,B,R)],Abr,Abr1),
-	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie,Lpt1,Li1,Lu1,Ls1),
-	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt,Li1,Lu1,Abr1),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr1).
+	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1),
+	affiche_evolution_Abox(Ls,[inst(I,some(R,C))|Lie],Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr1),!,
+	resolution(Lie1,Lpt1,Li1,Lu1,Ls1,Abr1).
 
 /*****************************************************/
 /* deduction_all(Lie,[],Li,Lu,Ls,Abr)*/
@@ -385,29 +372,28 @@ complete_some([inst(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr) :-
 /*test michelAnge, some(aCree,sculpture)*/
 deduction_all(Lie,[],Li,Lu,Ls,Abr).
 
-deduction_all(Lie,[inst(I,all(R,C))],Li,Lu,Ls,Abr) :-
-    nl,
+
+deduction_all(Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
+	memberchk(instR(I,B,R), Abr),
+	nl,
 	write("**************************************************************************************************"),nl,
 	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,all(R,C))),nl,
-	write("**************************************************************************************************"),	
-	nl,	
-	member(instR(I,B,R), Abr),
-	iname(I),iname(B),concept(C),rname(R),
-	evolue(inst(B,C),Lie,[],Li,Lu,Ls,Lie1,[],Li1,Lu1,Ls1),
-	affiche_evolution_Abox(Ls,Lie,[],Li,Lu,Abr,Ls1,Lie1,[],Li1,Lu1,Abr),!,
+	write("**************************************************************************************************"),
+	nl,
+	setof(inst(B,C), member(instR(I,B,R), Abr), Z),
+	evolue(Z,Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1),
+	affiche_evolution_Abox(Ls,Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),!,
 	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
 
 deduction_all(Lie,[inst(I,all(R,C))|Lpt],Li,Lu,Ls,Abr) :-
 	nl,
+	not(memberchk(instR(I,B,R), Abr)),
 	write("**************************************************************************************************"),nl,
 	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,all(R,C))),nl,
-	write("**************************************************************************************************"),	
-	nl,	
-	member(instR(I,B,R), Abr),
-	iname(I),iname(B),concept(C),rname(R),
-	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt,Li1,Lu1,Ls1),
-	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt,Li1,Lu1,Abr),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr).
+	write("          ne peut pas etre appliqué car la Abox par manque d'instance de role sur lesquels on peut appliqué cette propostion"), nl,
+	write("**************************************************************************************************"),
+	nl,
+	resolution(Lie, Lpt,Li,Lu,Ls,Abr).
 /*ajoute a la abox la formule (b,c) et retire le premier element de la liste Lpt*/
 
 /*****************************************************/
@@ -418,12 +404,12 @@ transformation_and(Lie,Lpt,[inst(I,and(C1,C2))|Li],Lu,Ls,Abr)  :-
     nl,
 	write("**************************************************************************************************"),nl,
 	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,and(C1,C2))),nl,
-	write("**************************************************************************************************"),	
-	nl,	
-	evolue(inst(I,C1),Lie,Lpt,[],Lu,Ls,Lie1,Lpt1,[],Lu1,Ls1),
-	evolue(inst(I,C2),Lie,Lpt,[],Lu,Ls1,Lie1,Lpt1,[],Lu1,Ls2),
-	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie1,Lpt1,Li1,Lu1,Abr),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls2,[]).
+	write("**************************************************************************************************"),
+	nl,
+	evolue(inst(I,C1),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1),
+	evolue(inst(I,C2),Lie1,Lpt1,Li1,Lu1,Ls1,Lie2,Lpt2,Li2,Lu2,Ls2),
+	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie2,Lpt2,Li2,Lu2,Abr),!,
+	resolution(Lie2, Lpt2,Li2,Lu2,Ls2,Abr).
 /*ajoute a la abox les instances (I,C1) et (I,C2) retire le premier element de la liste Li*/
 
 
@@ -437,21 +423,21 @@ transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
 	nl,
 	write("***********************************************************************"),nl,
 	write("          Evolution de la Abox pour la propostion :"),affiche_instance(inst(I,or(C1,C2))),nl,
-	write("***********************************************************************"),	nl,nl,	
-	
-	evolue(inst(I,C1),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls1),
+	write("***********************************************************************"),	nl,nl,
+
+	evolue(inst(I,C1),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1),
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),nl,
-	write("                       Branche 1                           "), nl,
+	write("                       Branche 1 ("), affiche_instance(inst(I,C1)),write(")                         "), nl,
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,nl,
-	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,[]),
-	
-	evolue(inst(I,C2),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls2),
+	affiche_evolution_Abox(Ls,Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),
+	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,Abr),
+
+	evolue(inst(I,C2),Lie,Lpt,Li,Lu,Ls,Lie2,Lpt2,Li2,Lu2,Ls2),
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),nl,
-	write("                        Branche 2                           "), nl,
+	write("                       Branche 2 ("), affiche_instance(inst(I,C2)),write(")                         "), nl,
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,nl,
-	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls2,Lie1,Lpt1,Li1,Lu1,Abr),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls2,[]).
+	affiche_evolution_Abox(Ls,Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Abr,Ls2,Lie2,Lpt2,Li2,Lu2,Abr),
+	resolution(Lie2, Lpt2,Li2,Lu2,Ls2,Abr).
 
 
 /*****************************************************/
@@ -464,8 +450,8 @@ evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Li = Li1,
 	Lu = Lu1,
-	concat([inst(B,C)],Ls,Z),
-	unique(Z,Ls1)
+	concat([inst(B,C)],Ls,Temp),
+	unique(Temp,Ls1)
 	.
 
 /*evolution d'un or*/
@@ -475,8 +461,8 @@ evolue(inst(B,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Li = Li1,
 	Ls = Ls1,
-	concat([inst(B,or(C1,C2))],Lu,Z),
-	unique(Z,Lu1)
+	concat([inst(B,or(C1,C2))],Lu,Temp),
+	unique(Temp,Lu1)
 	.
 /*evolution d'un and*/
 evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
@@ -485,8 +471,8 @@ evolue(inst(B,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Lu = Lu1,
 	Ls = Ls1,
-	concat([inst(B,and(C1,C2))],Li,Z),
-	unique(Z,Li1)
+	concat([inst(B,and(C1,C2))],Li,Temp),
+	unique(Temp,Li1)
 	.
 /*evolution d'un all*/
 evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
@@ -495,8 +481,8 @@ evolue(inst(B,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lu = Lu1,
 	Li = Li1,
 	Ls = Ls1,
-	concat([inst(B,all(R,C))],Lpt,Z),
-	unique(Z,Lpt1)
+	concat([inst(B,all(R,C))],Lpt,Temp),
+	unique(Temp,Lpt1)
 	.
 
 
@@ -507,10 +493,14 @@ evolue(inst(B,some(R,C)),Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
 	Lpt = Lpt1,
 	Li = Li1,
 	Ls = Ls1,
-	concat([inst(B,some(R,C))],Lie,Z),
-	unique(Z,Lie1)
-	.
+	concat([inst(B,some(R,C))],Lie,Temp),
+	unique(Temp,Lie1).
 
+/*cas d'une liste d'instance*/
+evolue([],Lie,Lpt,Li,Lu,Ls,Lie,Lpt,Li,Lu,Ls).
+evolue([inst(B,C)|Z],Lie,Lpt,Li,Lu,Ls,Lie1,Lpt1,Li1,Lu1,Ls1) :-
+	evolue(inst(B,C),Lie,Lpt,Li,Lu,Ls,LieT,LptT,LiT,LuT,LsT),
+	evolue(Z,LieT,LptT,LiT,LuT,LsT,Lie1,Lpt1,Li1,Lu1,Ls1).
 
 /*****************************************************/
 /* AFFICHAGE*/
@@ -565,7 +555,7 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	affiche_liste_inst(Lie2),
 	write("]"),
 	nl,
-	
+
 	nl
 	,
 	write("contenu de Lpt avant l'application de la regle:"),nl,
@@ -584,7 +574,7 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	affiche_liste_inst(Lpt2),
 	write("]"),
 	nl,
-	
+
 	nl
 	,
 	write("contenu de Li avant l'application de la regle:"),nl,
@@ -603,7 +593,7 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	affiche_liste_inst(Li2),
 	write("]"),
 	nl,
-	
+
 	nl
 	,
 	write("contenu de Lu avant l'application de la regle:"),nl,
@@ -623,7 +613,7 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	affiche_liste_inst(Lu2),
 	write("]"),
 	nl,
-	
+
 	nl
 	,
 	write("contenu de Abr avant l'application de la regle:"),nl,
@@ -642,6 +632,7 @@ affiche_evolution_Abox(Ls1, Lie1, Lpt1, Li1, Lu1, Abr1, Ls2, Lie2, Lpt2, Li2, Lu
 	affiche_liste_role(Abr2),
 	write("]"),
 	nl.
+
 affiche_liste_inst([]).
 affiche_liste_inst([X|L]) :- affiche_instance(X), write(","), nl, affiche_liste_inst(L).
 
