@@ -309,7 +309,7 @@ tri_Abox([inst(I,or(C1,C2))|Abi],Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls):-
 /*resolution(Lie,Lpt,Li,Lu,Ls,Abr)*/
 /*****************************************************/
 
-resolution([],[],[],[],Ls,[]) :- testclash(Ls) .
+resolution([],[],[],[],Ls,[]) :- testclash(Ls).
 
 resolution(Lie,Lpt,Li,Lu,Ls,Abr) :-
 	testclash(Ls),
@@ -444,7 +444,7 @@ transformation_or(Lie,Lpt,Li,[inst(I,or(C1,C2))|Lu],Ls,Abr) :-
 	write("                       Branche 1                           "), nl,
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),	nl,nl,
 	affiche_evolution_Abox(Ls,Lie,Lpt,Li,Lu,Abr,Ls1,Lie1,Lpt1,Li1,Lu1,Abr),!,
-	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,[]),
+	resolution(Lie1, Lpt1,Li1,Lu1,Ls1,[]) ,
 	
 	evolue(inst(I,C2),Lie,Lpt,Li,[],Ls,Lie1,Lpt1,Li1,[],Ls2),
 	write("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"),nl,
